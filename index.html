@@ -543,39 +543,96 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 <script>
 // ══════════════════════════ BASE ALIMENTS
 const DB=[
-  {n:'Blanc de poulet cuit',    cat:'Volaille',     k:110,p:23.0,g:0.0,l:1.5},
-  {n:'Blanc de poulet cru',     cat:'Volaille',     k:106,p:22.0,g:0.0,l:1.8},
-  {n:'Escalope dinde crue',     cat:'Volaille',     k:104,p:22.5,g:0.0,l:1.5},
-  {n:'Blanc de dinde cuit',     cat:'Volaille',     k:112,p:24.0,g:0.0,l:1.5},
-  {n:'Boeuf hache 5% MG',       cat:'Boeuf',        k:136,p:21.0,g:0.0,l:5.0},
-  {n:'Boeuf hache 10% MG',      cat:'Boeuf',        k:164,p:19.5,g:0.0,l:10.0},
+  // VOLAILLE
+  {n:'Blanc poulet cuit',        cat:'Volaille',     k:110,p:23.0,g:0.0,l:1.5},
+  {n:'Blanc poulet cru',         cat:'Volaille',     k:106,p:22.0,g:0.0,l:1.8},
+  {n:'Cuisse poulet cuite',      cat:'Volaille',     k:185,p:19.0,g:0.0,l:12.0},
+  {n:'Escalope dinde crue',      cat:'Volaille',     k:104,p:22.5,g:0.0,l:1.5},
+  {n:'Blanc dinde cuit',         cat:'Volaille',     k:112,p:24.0,g:0.0,l:1.5},
+  {n:'Poulet roti sans peau',    cat:'Volaille',     k:165,p:25.0,g:0.0,l:7.0},
+  // BOEUF
+  {n:'Boeuf hache 5% MG',        cat:'Boeuf',        k:136,p:21.0,g:0.0,l:5.0},
+  {n:'Boeuf hache 10% MG',       cat:'Boeuf',        k:164,p:19.5,g:0.0,l:10.0},
+  {n:'Boeuf hache 15% MG',       cat:'Boeuf',        k:195,p:18.0,g:0.0,l:14.0},
   {n:'Steak rumsteck',           cat:'Boeuf',        k:142,p:22.0,g:0.0,l:6.0},
+  {n:'Steak bavette',            cat:'Boeuf',        k:158,p:21.0,g:0.0,l:8.5},
+  {n:'Boeuf bourguignon',        cat:'Boeuf',        k:135,p:20.0,g:2.0,l:5.5},
+  // PORC
+  {n:'Filet mignon porc',        cat:'Porc',         k:109,p:22.0,g:0.0,l:2.5},
+  {n:'Cote de porc maigre',      cat:'Porc',         k:152,p:21.0,g:0.0,l:7.5},
+  {n:'Porc hache 10%',           cat:'Porc',         k:160,p:19.0,g:0.0,l:10.0},
+  // AGNEAU
+  {n:'Gigot agneau cuit',        cat:'Agneau',       k:191,p:25.0,g:0.0,l:10.0},
+  // POISSON
   {n:'Saumon frais',             cat:'Poisson',      k:208,p:20.0,g:0.0,l:13.0},
+  {n:'Saumon fume',              cat:'Poisson',      k:172,p:25.0,g:0.0,l:8.0},
   {n:'Maquereau filet',          cat:'Poisson',      k:189,p:19.0,g:0.0,l:12.0},
-  {n:'Thon au naturel',          cat:'Poisson',      k:103,p:23.0,g:0.0,l:1.0},
+  {n:'Thon au naturel boite',    cat:'Poisson',      k:103,p:23.0,g:0.0,l:1.0},
+  {n:'Thon huile egoutte',       cat:'Poisson',      k:198,p:25.0,g:0.0,l:11.0},
   {n:'Cabillaud filet',          cat:'Poisson',      k:82, p:18.0,g:0.0,l:0.7},
-  {n:'Crevettes cuites',         cat:'Fruits de mer',k:99, p:21.0,g:0.0,l:1.5},
+  {n:'Lieu noir filet',          cat:'Poisson',      k:85, p:18.5,g:0.0,l:0.9},
   {n:'Sardines boite',           cat:'Poisson',      k:208,p:24.5,g:0.0,l:12.0},
+  {n:'Truite filet',             cat:'Poisson',      k:149,p:20.0,g:0.0,l:7.5},
+  {n:'Tilapia filet',            cat:'Poisson',      k:96, p:20.0,g:0.0,l:2.0},
+  {n:'Bar filet',                cat:'Poisson',      k:97, p:18.5,g:0.0,l:2.5},
+  {n:'Dorade filet',             cat:'Poisson',      k:96, p:18.0,g:0.0,l:2.8},
+  {n:'Crevettes cuites',         cat:'Fruits de mer',k:99, p:21.0,g:0.0,l:1.5},
+  {n:'Moules cuites',            cat:'Fruits de mer',k:86, p:12.0,g:3.7,l:2.2},
+  {n:'Calamar',                  cat:'Fruits de mer',k:92, p:15.6,g:3.1,l:1.4},
+  // OEUFS
   {n:'Oeuf entier 1oeuf 55g',   cat:'Oeufs',        k:143,p:12.5,g:0.6,l:9.5},
   {n:'Blanc oeuf',               cat:'Oeufs',        k:52, p:11.0,g:0.7,l:0.2},
+  {n:'Omelette 2 oeufs',         cat:'Oeufs',        k:154,p:11.0,g:0.5,l:12.0},
+  // CHARCUTERIE
   {n:'Jambon blanc degraisse',   cat:'Charcuterie',  k:107,p:18.5,g:0.5,l:3.5},
+  {n:'Jambon de pays sec',       cat:'Charcuterie',  k:145,p:22.0,g:0.5,l:6.0},
+  {n:'Blanc de dinde tranche',   cat:'Charcuterie',  k:89, p:17.5,g:0.5,l:1.5},
+  // LAITIERS
   {n:'Yaourt grec 0%',           cat:'Laitiers',     k:57, p:10.0,g:4.0,l:0.2},
+  {n:'Yaourt grec 10%',          cat:'Laitiers',     k:133,p:7.0, g:4.0,l:10.0},
   {n:'Skyr nature',              cat:'Laitiers',     k:63, p:11.0,g:4.0,l:0.2},
   {n:'Fromage blanc 0%',         cat:'Laitiers',     k:46, p:7.5, g:4.0,l:0.1},
+  {n:'Fromage blanc 20%',        cat:'Laitiers',     k:91, p:7.0, g:4.0,l:5.0},
   {n:'Cottage cheese',           cat:'Laitiers',     k:72, p:12.5,g:3.5,l:1.0},
   {n:'Mozzarella',               cat:'Laitiers',     k:264,p:18.0,g:2.2,l:20.0},
+  {n:'Parmesan rape',            cat:'Laitiers',     k:392,p:32.0,g:0.0,l:29.0},
+  {n:'Emmental rape',            cat:'Laitiers',     k:382,p:29.0,g:0.5,l:29.0},
+  {n:'Lait ecreme',              cat:'Laitiers',     k:35, p:3.4, g:5.0,l:0.1},
+  {n:'Lait demi ecreme',         cat:'Laitiers',     k:47, p:3.3, g:4.8,l:1.6},
+  // SUPPLEMENTS
   {n:'Whey Isolate dose 30g',    cat:'Supplements',  k:114,p:25.0,g:2.0,l:0.5},
   {n:'Creatine monohydrate 5g',  cat:'Supplements',  k:0,  p:0.0, g:0.0,l:0.0},
+  {n:'Caséine dose 30g',         cat:'Supplements',  k:112,p:24.0,g:3.0,l:1.0},
+  {n:'BCAA dose 10g',            cat:'Supplements',  k:40, p:10.0,g:0.0,l:0.0},
+  // FECULENTS
   {n:'Riz basmati cru',          cat:'Feculents',    k:350,p:7.5, g:77.0,l:0.5},
   {n:'Riz basmati cuit',         cat:'Feculents',    k:130,p:2.7, g:28.0,l:0.2},
+  {n:'Riz complet cuit',         cat:'Feculents',    k:123,p:2.6, g:26.0,l:1.0},
+  {n:'Riz jasmin cuit',          cat:'Feculents',    k:129,p:2.7, g:28.0,l:0.2},
   {n:'Patate douce crue',        cat:'Feculents',    k:86, p:1.6, g:20.0,l:0.1},
   {n:'Patate douce cuite',       cat:'Feculents',    k:76, p:1.4, g:17.5,l:0.1},
+  {n:'Pomme de terre cuite',     cat:'Feculents',    k:87, p:1.9, g:20.0,l:0.1},
   {n:'Flocons avoine',           cat:'Feculents',    k:364,p:12.5,g:62.0,l:6.5},
   {n:'Pain complet',             cat:'Feculents',    k:247,p:8.5, g:44.0,l:3.0},
-  {n:'Lentilles cuites',         cat:'Legumineuses', k:116,p:9.0, g:20.0,l:0.4},
-  {n:'Pois chiches cuits',       cat:'Legumineuses', k:164,p:8.9, g:27.0,l:2.6},
+  {n:'Pain de mie complet',      cat:'Feculents',    k:229,p:8.0, g:42.0,l:3.0},
+  {n:'Pates completes cuites',   cat:'Feculents',    k:130,p:5.0, g:25.0,l:1.0},
+  {n:'Pates blanches cuites',    cat:'Feculents',    k:131,p:5.0, g:25.5,l:1.0},
   {n:'Quinoa cuit',              cat:'Feculents',    k:120,p:4.4, g:21.0,l:1.9},
-  {n:'Pomme de terre cuite',     cat:'Feculents',    k:87, p:1.9, g:20.0,l:0.1},
+  {n:'Boulgour cuit',            cat:'Feculents',    k:112,p:3.8, g:23.0,l:0.5},
+  {n:'Sarrasin cuit',            cat:'Feculents',    k:92, p:3.4, g:20.0,l:0.6},
+  {n:'Millet cuit',              cat:'Feculents',    k:119,p:3.5, g:23.7,l:1.0},
+  {n:'Polenta cuite',            cat:'Feculents',    k:70, p:1.7, g:15.0,l:0.3},
+  // LEGUMINEUSES
+  {n:'Lentilles cuites',         cat:'Legumineuses', k:116,p:9.0, g:20.0,l:0.4},
+  {n:'Lentilles corail cuites',  cat:'Legumineuses', k:100,p:8.0, g:18.0,l:0.5},
+  {n:'Pois chiches cuits',       cat:'Legumineuses', k:164,p:8.9, g:27.0,l:2.6},
+  {n:'Haricots rouges cuits',    cat:'Legumineuses', k:127,p:8.7, g:22.0,l:0.5},
+  {n:'Haricots blancs cuits',    cat:'Legumineuses', k:118,p:8.0, g:21.0,l:0.5},
+  {n:'Feves cuites',             cat:'Legumineuses', k:88, p:8.0, g:13.0,l:0.4},
+  {n:'Edamame cuit',             cat:'Legumineuses', k:122,p:11.0,g:10.0,l:5.0},
+  {n:'Tofu ferme',               cat:'Soja',         k:76, p:8.0, g:1.9, l:4.8},
+  {n:'Tempeh',                   cat:'Soja',         k:195,p:19.0,g:9.0, l:11.0},
+  // FRUITS
   {n:'Banane',                   cat:'Fruits',       k:89, p:1.1, g:22.0,l:0.3},
   {n:'Pomme',                    cat:'Fruits',       k:52, p:0.3, g:14.0,l:0.2},
   {n:'Orange',                   cat:'Fruits',       k:47, p:0.9, g:12.0,l:0.1},
@@ -583,12 +640,27 @@ const DB=[
   {n:'Mangue',                   cat:'Fruits',       k:60, p:0.8, g:15.0,l:0.4},
   {n:'Myrtilles',                cat:'Fruits',       k:57, p:0.7, g:14.0,l:0.3},
   {n:'Fraises',                  cat:'Fruits',       k:32, p:0.7, g:7.7, l:0.3},
+  {n:'Peche',                    cat:'Fruits',       k:39, p:0.9, g:9.5, l:0.3},
+  {n:'Poire',                    cat:'Fruits',       k:57, p:0.4, g:15.0,l:0.1},
+  {n:'Ananas',                   cat:'Fruits',       k:50, p:0.5, g:13.0,l:0.1},
+  {n:'Raisin',                   cat:'Fruits',       k:69, p:0.7, g:18.0,l:0.2},
+  {n:'Cerise',                   cat:'Fruits',       k:63, p:1.1, g:16.0,l:0.2},
+  {n:'Melon',                    cat:'Fruits',       k:28, p:0.8, g:6.5, l:0.2},
+  {n:'Pasteque',                 cat:'Fruits',       k:30, p:0.6, g:7.5, l:0.2},
+  // LIPIDES
   {n:'Huile olive 1cs 10g',      cat:'Lipides',      k:90, p:0.0, g:0.0, l:10.0},
+  {n:'Huile coco 1cs 10g',       cat:'Lipides',      k:86, p:0.0, g:0.0, l:10.0},
   {n:'Avocat',                   cat:'Lipides',      k:160,p:2.0, g:9.0, l:15.0},
+  {n:'Beurre',                   cat:'Lipides',      k:717,p:0.9, g:0.1, l:81.0},
   {n:'Amandes',                  cat:'Oleagineux',   k:579,p:21.0,g:22.0,l:50.0},
   {n:'Noix',                     cat:'Oleagineux',   k:654,p:15.0,g:14.0,l:65.0},
+  {n:'Noisettes',                cat:'Oleagineux',   k:628,p:15.0,g:17.0,l:61.0},
   {n:'Beurre cacahuete naturel', cat:'Oleagineux',   k:588,p:25.0,g:20.0,l:50.0},
   {n:'Noix de cajou',            cat:'Oleagineux',   k:553,p:18.0,g:30.0,l:44.0},
+  {n:'Graines chia',             cat:'Oleagineux',   k:486,p:17.0,g:42.0,l:31.0},
+  {n:'Graines lin',              cat:'Oleagineux',   k:534,p:18.0,g:29.0,l:42.0},
+  {n:'Graines courge',           cat:'Oleagineux',   k:559,p:30.0,g:11.0,l:49.0},
+  // LEGUMES
   {n:'Brocoli',                  cat:'Legumes',      k:34, p:2.8, g:7.0, l:0.4},
   {n:'Epinards',                 cat:'Legumes',      k:23, p:2.9, g:3.6, l:0.4},
   {n:'Courgette',                cat:'Legumes',      k:17, p:1.2, g:3.1, l:0.3},
@@ -596,11 +668,29 @@ const DB=[
   {n:'Champignons Paris',        cat:'Legumes',      k:22, p:3.1, g:3.3, l:0.3},
   {n:'Salade verte',             cat:'Legumes',      k:15, p:1.4, g:2.9, l:0.2},
   {n:'Tomate',                   cat:'Legumes',      k:18, p:0.9, g:3.9, l:0.2},
-  {n:'Poivron',                  cat:'Legumes',      k:26, p:1.0, g:6.0, l:0.3},
+  {n:'Tomates cerises',          cat:'Legumes',      k:18, p:0.9, g:3.9, l:0.2},
+  {n:'Poivron rouge',            cat:'Legumes',      k:31, p:1.0, g:6.0, l:0.3},
+  {n:'Poivron vert',             cat:'Legumes',      k:20, p:0.9, g:4.6, l:0.2},
   {n:'Concombre',                cat:'Legumes',      k:15, p:0.7, g:3.6, l:0.1},
   {n:'Asperges',                 cat:'Legumes',      k:20, p:2.2, g:3.9, l:0.1},
-  {n:'Edamame cuit',             cat:'Legumineuses', k:122,p:11.0,g:10.0,l:5.0},
-  {n:'Tofu ferme',               cat:'Soja',         k:76, p:8.0, g:1.9, l:4.8},
+  {n:'Aubergine',                cat:'Legumes',      k:25, p:1.0, g:5.7, l:0.2},
+  {n:'Celeri branche',           cat:'Legumes',      k:16, p:0.7, g:3.0, l:0.2},
+  {n:'Carotte',                  cat:'Legumes',      k:41, p:0.9, g:9.6, l:0.2},
+  {n:'Chou fleur',               cat:'Legumes',      k:25, p:1.9, g:5.0, l:0.3},
+  {n:'Chou bruxelles',           cat:'Legumes',      k:43, p:3.4, g:8.9, l:0.3},
+  {n:'Poireaux',                 cat:'Legumes',      k:31, p:1.8, g:7.0, l:0.3},
+  {n:'Oignon',                   cat:'Legumes',      k:40, p:1.1, g:9.3, l:0.1},
+  {n:'Ail',                      cat:'Legumes',      k:149,p:6.4, g:33.0,l:0.5},
+  {n:'Betterave cuite',          cat:'Legumes',      k:44, p:1.7, g:10.0,l:0.1},
+  {n:'Radis',                    cat:'Legumes',      k:16, p:0.7, g:3.4, l:0.1},
+  {n:'Fenouil',                  cat:'Legumes',      k:31, p:1.2, g:7.3, l:0.2},
+  {n:'Endive',                   cat:'Legumes',      k:17, p:0.9, g:3.1, l:0.1},
+  // SAUCES ET CONDIMENTS
+  {n:'Sauce soja',               cat:'Condiments',   k:60, p:8.0, g:5.6, l:0.1},
+  {n:'Moutarde',                 cat:'Condiments',   k:66, p:4.4, g:5.3, l:3.3},
+  {n:'Ketchup',                  cat:'Condiments',   k:112,p:1.3, g:27.0,l:0.1},
+  {n:'Vinaigre balsamique',      cat:'Condiments',   k:88, p:0.5, g:17.0,l:0.0},
+  {n:'Sauce tomate nature',      cat:'Condiments',   k:32, p:1.5, g:6.0, l:0.2},
 ];
 
 const JOURS=[
@@ -724,7 +814,7 @@ async function searchOFF(q){
   const st=document.getElementById('srch-status');
   const box=document.getElementById('sugg-box');
   try{
-    const url=`https://https://api.allorigins.win/raw?url=https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(q)}&search_simple=1&action=process&json=1&page_size=10&fields=product_name,nutriments,brands`;
+    const url=`https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(q)}&search_simple=1&action=process&json=1&page_size=10&fields=product_name,nutriments,brands`;
     const res=await fetch(url);
     const json=await res.json();
     if(!json.products||!json.products.length){st.textContent='Aucun résultat';box.style.display='none';return;}
@@ -875,7 +965,7 @@ async function fetchOFFBarcode(barcode){
   const st=document.getElementById('srch-status');
   st.textContent='Recherche produit…';
   try{
-    const res=await fetch(`https://https://api.allorigins.win/raw?url=https://world.openfoodfacts.org/api/v2/product/${barcode}.json?fields=product_name,nutriments,brands`);
+    const res=await fetch(`https://world.openfoodfacts.org/api/v2/product/${barcode}.json?fields=product_name,nutriments,brands`);
     const json=await res.json();
     if(json.status!==1||!json.product){st.textContent='Produit non trouvé';return;}
     const p=json.product;const n=p.nutriments;
