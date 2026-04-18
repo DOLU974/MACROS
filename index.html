@@ -724,7 +724,7 @@ async function searchOFF(q){
   const st=document.getElementById('srch-status');
   const box=document.getElementById('sugg-box');
   try{
-    const url=`https://https://corsproxy.io/?https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(q)}&search_simple=1&action=process&json=1&page_size=10&fields=product_name,nutriments,brands`;
+    const url=`https://https://api.allorigins.win/raw?url=https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(q)}&search_simple=1&action=process&json=1&page_size=10&fields=product_name,nutriments,brands`;
     const res=await fetch(url);
     const json=await res.json();
     if(!json.products||!json.products.length){st.textContent='Aucun résultat';box.style.display='none';return;}
@@ -875,7 +875,7 @@ async function fetchOFFBarcode(barcode){
   const st=document.getElementById('srch-status');
   st.textContent='Recherche produit…';
   try{
-    const res=await fetch(`https://https://corsproxy.io/?https://world.openfoodfacts.org/api/v2/product/${barcode}.json?fields=product_name,nutriments,brands`);
+    const res=await fetch(`https://https://api.allorigins.win/raw?url=https://world.openfoodfacts.org/api/v2/product/${barcode}.json?fields=product_name,nutriments,brands`);
     const json=await res.json();
     if(json.status!==1||!json.product){st.textContent='Produit non trouvé';return;}
     const p=json.product;const n=p.nutriments;
