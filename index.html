@@ -9,7 +9,7 @@
 <meta name="theme-color" content="#0f0f0f">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon.png">
-<title>Macros Ludo</title>
+<title>Macros Ludo v2</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Sora:wght@400;500;600&display=swap');
 :root{
@@ -263,7 +263,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 <!-- ═══════════ PANEL SEMAINE ═══════════ -->
 <div id="p-semaine" class="panel on">
   <div class="hdr">
-    <div class="hdr-l"><div class="hdr-lbl">Macros semaine</div><div class="hdr-title">Ludo</div></div>
+    <div class="hdr-l"><div class="hdr-lbl">Macros semaine · v2</div><div class="hdr-title">Ludo</div></div>
     <button class="btn-danger" onclick="resetSemaine()">Reset</button>
   </div>
   <div class="strip">
@@ -691,6 +691,76 @@ const DB=[
   {n:'Ketchup',                  cat:'Condiments',   k:112,p:1.3, g:27.0,l:0.1},
   {n:'Vinaigre balsamique',      cat:'Condiments',   k:88, p:0.5, g:17.0,l:0.0},
   {n:'Sauce tomate nature',      cat:'Condiments',   k:32, p:1.5, g:6.0, l:0.2},
+  // PLATS CUISINES / PRODUITS COURANTS
+  {n:'Yaourt nature entier',     cat:'Laitiers',     k:61, p:3.5, g:4.7, l:3.5},
+  {n:'Yaourt nature 0%',         cat:'Laitiers',     k:39, p:4.5, g:4.5, l:0.1},
+  {n:'Kefir nature',             cat:'Laitiers',     k:52, p:3.3, g:4.8, l:1.8},
+  {n:'Creme fraiche 15%',        cat:'Laitiers',     k:162,p:2.9, g:3.8, l:15.0},
+  {n:'Creme fraiche 30%',        cat:'Laitiers',     k:292,p:2.4, g:3.1, l:30.0},
+  // FRUITS SUPPLEMENTAIRES
+  {n:'Citron',                   cat:'Fruits',       k:29, p:1.1, g:9.3, l:0.3},
+  {n:'Pamplemousse',             cat:'Fruits',       k:42, p:0.8, g:11.0,l:0.1},
+  {n:'Abricot',                  cat:'Fruits',       k:48, p:1.4, g:11.0,l:0.4},
+  {n:'Prune',                    cat:'Fruits',       k:46, p:0.7, g:11.0,l:0.3},
+  {n:'Figue fraiche',            cat:'Fruits',       k:74, p:0.8, g:19.0,l:0.3},
+  {n:'Grenade',                  cat:'Fruits',       k:83, p:1.7, g:19.0,l:1.2},
+  {n:'Papaye',                   cat:'Fruits',       k:43, p:0.5, g:11.0,l:0.3},
+  {n:'Litchi',                   cat:'Fruits',       k:66, p:0.8, g:17.0,l:0.4},
+  {n:'Cassis',                   cat:'Fruits',       k:63, p:1.4, g:15.0,l:0.4},
+  {n:'Framboises',               cat:'Fruits',       k:52, p:1.2, g:12.0,l:0.7},
+  {n:'Mures',                    cat:'Fruits',       k:43, p:1.4, g:10.0,l:0.5},
+  {n:'Datte',                    cat:'Fruits',       k:282,p:2.5, g:75.0,l:0.4},
+  {n:'Raisin sec',               cat:'Fruits',       k:299,p:3.1, g:79.0,l:0.5},
+  {n:'Abricot sec',              cat:'Fruits',       k:241,p:3.4, g:63.0,l:0.5},
+  // PATES SUPPLEMENTAIRES
+  {n:'Pates penne cuites',       cat:'Feculents',    k:131,p:5.0, g:25.5,l:1.0},
+  {n:'Pates spaghetti cuites',   cat:'Feculents',    k:131,p:5.0, g:25.5,l:1.0},
+  {n:'Pates tagliatelles cuites',cat:'Feculents',    k:131,p:5.0, g:25.5,l:1.0},
+  {n:'Pates crus 100g',          cat:'Feculents',    k:350,p:13.0,g:70.0,l:2.0},
+  {n:'Nouilles de riz cuites',   cat:'Feculents',    k:109,p:2.0, g:25.0,l:0.2},
+  {n:'Gnocchis cuits',           cat:'Feculents',    k:130,p:2.5, g:28.0,l:0.5},
+  {n:'Couscous cuit',            cat:'Feculents',    k:112,p:3.8, g:23.0,l:0.2},
+  // RIZ SUPPLEMENTAIRE
+  {n:'Riz thai cuit',            cat:'Feculents',    k:130,p:2.7, g:28.5,l:0.3},
+  {n:'Riz sauvage cuit',         cat:'Feculents',    k:101,p:4.0, g:21.0,l:0.3},
+  {n:'Riz arborio cuit',         cat:'Feculents',    k:130,p:2.5, g:28.0,l:0.2},
+  // VIANDES SUPPLEMENTAIRES
+  {n:'Veau escalope',            cat:'Veau',         k:109,p:22.0,g:0.0, l:2.5},
+  {n:'Foie de veau',             cat:'Veau',         k:135,p:20.0,g:3.0, l:4.5},
+  {n:'Canard magret cru',        cat:'Volaille',     k:205,p:19.0,g:0.0, l:14.0},
+  {n:'Lapin cuit',               cat:'Viande',       k:162,p:24.0,g:0.0, l:7.5},
+  {n:'Cheval',                   cat:'Viande',       k:110,p:22.0,g:0.0, l:2.5},
+  // PAIN ET VIENNOISERIES
+  {n:'Pain blanc baguette',      cat:'Feculents',    k:270,p:8.5, g:55.0,l:1.5},
+  {n:'Pain aux cereales',        cat:'Feculents',    k:252,p:9.0, g:46.0,l:3.5},
+  {n:'Pain de seigle',           cat:'Feculents',    k:259,p:8.5, g:48.0,l:3.3},
+  {n:'Biscottes',                cat:'Feculents',    k:388,p:10.0,g:74.0,l:6.0},
+  {n:'Galette de riz',           cat:'Feculents',    k:387,p:7.9, g:84.0,l:2.8},
+  // FROMAGES
+  {n:'Camembert',                cat:'Fromages',     k:264,p:19.0,g:0.1, l:21.0},
+  {n:'Brie',                     cat:'Fromages',     k:334,p:20.0,g:0.1, l:28.0},
+  {n:'Comté',                    cat:'Fromages',     k:415,p:27.0,g:0.1, l:34.0},
+  {n:'Gruyere',                  cat:'Fromages',     k:413,p:29.0,g:0.1, l:32.0},
+  {n:'Feta',                     cat:'Fromages',     k:264,p:14.0,g:4.1, l:21.0},
+  {n:'Ricotta',                  cat:'Fromages',     k:136,p:11.0,g:3.0, l:10.0},
+  {n:'Boursin ail fines herbes', cat:'Fromages',     k:290,p:7.5, g:3.5, l:27.0},
+  // CEREALES ET BARRES
+  {n:'Muesli sans sucre',        cat:'Feculents',    k:370,p:11.0,g:60.0,l:8.0},
+  {n:'Son davoine',              cat:'Feculents',    k:246,p:17.0,g:58.0,l:7.0},
+  {n:'Germe de ble',             cat:'Feculents',    k:360,p:29.0,g:45.0,l:10.0},
+  // BOISSONS
+  {n:'Lait de coco 10cl',        cat:'Boissons',     k:197,p:1.5, g:3.3, l:20.0},
+  {n:'Lait d amande 10cl',       cat:'Boissons',     k:24, p:0.8, g:3.0, l:1.0},
+  {n:'Lait de soja 10cl',        cat:'Boissons',     k:39, p:3.3, g:2.5, l:1.9},
+  {n:'Jus orange 10cl',          cat:'Boissons',     k:44, p:0.7, g:10.0,l:0.2},
+  {n:'Jus pomme 10cl',           cat:'Boissons',     k:47, p:0.1, g:11.5,l:0.1},
+  // DIVERS UTILES
+  {n:'Miel 1cs 15g',             cat:'Divers',       k:45, p:0.1, g:12.0,l:0.0},
+  {n:'Confiture 1cs 20g',        cat:'Divers',       k:52, p:0.1, g:14.0,l:0.0},
+  {n:'Chocolat noir 70%',        cat:'Divers',       k:598,p:8.0, g:46.0,l:43.0},
+  {n:'Chocolat au lait',         cat:'Divers',       k:535,p:8.0, g:57.0,l:30.0},
+  {n:'Sucre blanc',              cat:'Divers',       k:400,p:0.0, g:100.0,l:0.0},
+  {n:'Farine ble T55',           cat:'Feculents',    k:364,p:10.0,g:76.0,l:1.2},
 ];
 
 const JOURS=[
