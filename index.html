@@ -1,24 +1,590 @@
-MACROS SEMAINE
-Ludo
-Reset
-PROT. MOY.
-0g
-GLUC. MOY.
-0g
-LIP. MOY.
-0g
-KCAL MOY.
-0
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Calculateur Macros — Ludo</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Sora:wght@300;400;500;600&display=swap');
 
-📅
-SEMAINE
-＋
-AJOUTER
-★
-FAVORIS
-📋
-PROGRAMME
-⚖️
-SUIVI
+  :root {
+    --bg: #0f0f0f;
+    --surface: #1a1a1a;
+    --surface2: #222222;
+    --border: rgba(255,255,255,0.08);
+    --border2: rgba(255,255,255,0.14);
+    --text: #f0ede8;
+    --muted: #888;
+    --accent: #c8f060;
+    --accent-dim: rgba(200,240,96,0.10);
+    --red: #ff6b5b;
+    --red-dim: rgba(255,107,91,0.10);
+    --blue: #60b8f0;
+    --blue-dim: rgba(96,184,240,0.10);
+    --amber: #f0c060;
+    --amber-dim: rgba(240,192,96,0.10);
+    --font: 'Sora', sans-serif;
+    --mono: 'DM Mono', monospace;
+  }
 
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--font); font-size: 14px; line-height: 1.6; min-height: 100vh; }
 
+  /* HEADER */
+  .header { padding: 24px 20px 0; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--bg); z-index: 100; }
+  .header-title { font-size: 10px; font-family: var(--mono); color: var(--accent); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 2px; }
+  .header-name { font-size: 20px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 14px; }
+
+  /* JOUR SELECTOR */
+  .jour-selector { display: flex; gap: 6px; padding: 0 0 14px; overflow-x: auto; scrollbar-width: none; }
+  .jour-selector::-webkit-scrollbar { display: none; }
+  .jour-btn { border: 1px solid var(--border2); background: none; color: var(--muted); font-family: var(--mono); font-size: 11px; padding: 6px 14px; border-radius: 6px; cursor: pointer; white-space: nowrap; transition: all 0.15s; }
+  .jour-btn.active { background: var(--accent-dim); border-color: rgba(200,240,96,0.35); color: var(--accent); }
+
+  /* CIBLES */
+  .cibles { display: grid; grid-template-columns: repeat(3,1fr); gap: 6px; padding: 14px 20px; border-bottom: 1px solid var(--border); }
+  .cible-box { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; text-align: center; }
+  .cible-lbl { font-size: 10px; font-family: var(--mono); color: var(--muted); margin-bottom: 3px; }
+  .cible-val { font-size: 15px; font-weight: 600; font-family: var(--mono); }
+  .cible-val.p { color: var(--blue); }
+  .cible-val.g { color: var(--accent); }
+  .cible-val.l { color: var(--amber); }
+
+  /* MAIN */
+  .main { padding: 16px 20px; }
+
+  /* SEARCH + ADD */
+  .search-wrap { position: relative; margin-bottom: 10px; }
+  .search-input {
+    width: 100%; background: var(--surface); border: 1px solid var(--border2);
+    border-radius: 10px; color: var(--text); font-family: var(--font); font-size: 14px;
+    padding: 11px 14px 11px 38px; outline: none; transition: border-color 0.2s;
+  }
+  .search-input:focus { border-color: var(--accent); }
+  .search-icon { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 15px; pointer-events: none; }
+  .search-clear { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 18px; cursor: pointer; display: none; background: none; border: none; line-height: 1; }
+
+  /* SUGGESTIONS */
+  .suggestions {
+    background: var(--surface); border: 1px solid var(--border2); border-radius: 10px;
+    margin-bottom: 10px; max-height: 260px; overflow-y: auto; display: none;
+  }
+  .sugg-item { padding: 10px 14px; cursor: pointer; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; transition: background 0.1s; }
+  .sugg-item:last-child { border-bottom: none; }
+  .sugg-item:hover, .sugg-item:active { background: var(--surface2); }
+  .sugg-name { font-size: 13px; font-weight: 500; }
+  .sugg-cat { font-size: 10px; font-family: var(--mono); color: var(--muted); margin-top: 1px; }
+  .sugg-macros { font-size: 11px; font-family: var(--mono); color: var(--muted); text-align: right; }
+  .sugg-macros span { display: block; }
+
+  /* AJOUT MANUEL */
+  .manual-form { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-bottom: 14px; display: none; }
+  .manual-title { font-size: 11px; font-family: var(--mono); color: var(--accent); margin-bottom: 10px; letter-spacing: 0.06em; }
+  .manual-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .manual-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; }
+  .field-lbl { font-size: 10px; font-family: var(--mono); color: var(--muted); margin-bottom: 4px; }
+  .field-input {
+    width: 100%; background: var(--surface2); border: 1px solid var(--border2);
+    border-radius: 6px; color: var(--text); font-family: var(--mono); font-size: 13px;
+    padding: 8px 10px; outline: none;
+  }
+  .field-input:focus { border-color: var(--accent); }
+  .btn-add { width: 100%; background: var(--accent); color: #0f0f0f; border: none; border-radius: 8px; padding: 10px; font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; margin-top: 10px; transition: opacity 0.2s; }
+  .btn-add:hover { opacity: 0.85; }
+  .btn-add-manual { width: 100%; background: none; border: 1px dashed var(--border2); border-radius: 8px; color: var(--muted); font-family: var(--mono); font-size: 11px; padding: 10px; cursor: pointer; letter-spacing: 0.06em; transition: all 0.15s; margin-bottom: 14px; }
+  .btn-add-manual:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* REPAS SECTION */
+  .section-title { font-size: 10px; font-family: var(--mono); color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; }
+
+  /* REPAS TABS */
+  .repas-tabs { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+  .repas-tab { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; color: var(--muted); font-family: var(--mono); font-size: 11px; padding: 5px 12px; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+  .repas-tab.active { background: var(--surface2); border-color: var(--border2); color: var(--text); }
+  .btn-new-repas { background: none; border: 1px dashed var(--border); border-radius: 6px; color: var(--muted); font-family: var(--mono); font-size: 11px; padding: 5px 10px; cursor: pointer; }
+  .btn-new-repas:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* LISTE ALIMENTS */
+  .aliment-list { margin-bottom: 14px; }
+  .aliment-item {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+    padding: 10px 12px; margin-bottom: 6px;
+    display: flex; justify-content: space-between; align-items: center; gap: 10px;
+  }
+  .aliment-name { font-size: 13px; font-weight: 500; }
+  .aliment-qte { font-size: 11px; font-family: var(--mono); color: var(--muted); }
+  .aliment-macros { display: flex; gap: 8px; font-size: 11px; font-family: var(--mono); }
+  .am-p { color: var(--blue); }
+  .am-g { color: var(--accent); }
+  .am-l { color: var(--amber); }
+  .aliment-right { display: flex; align-items: center; gap: 10px; }
+  .btn-del { background: none; border: none; color: var(--muted); font-size: 16px; cursor: pointer; padding: 2px 4px; line-height: 1; transition: color 0.15s; }
+  .btn-del:hover { color: var(--red); }
+  .empty-state { text-align: center; padding: 24px; font-size: 12px; font-family: var(--mono); color: var(--muted); border: 1px dashed var(--border); border-radius: 8px; }
+
+  /* TOTAUX REPAS */
+  .totaux-repas { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; margin-bottom: 14px; }
+  .totaux-title { font-size: 10px; font-family: var(--mono); color: var(--muted); margin-bottom: 10px; }
+  .totaux-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 6px; }
+  .total-cell { text-align: center; }
+  .total-lbl { font-size: 10px; font-family: var(--mono); color: var(--muted); margin-bottom: 2px; }
+  .total-num { font-size: 16px; font-weight: 600; font-family: var(--mono); }
+  .total-num.p { color: var(--blue); }
+  .total-num.g { color: var(--accent); }
+  .total-num.l { color: var(--amber); }
+  .total-num.k { color: var(--text); }
+
+  /* BILAN JOURNEE */
+  .bilan { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
+  .bilan-title { font-size: 10px; font-family: var(--mono); color: var(--muted); margin-bottom: 12px; }
+  .bilan-row { margin-bottom: 12px; }
+  .bilan-row:last-child { margin-bottom: 0; }
+  .bilan-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 5px; }
+  .bilan-macro { font-size: 12px; font-family: var(--mono); font-weight: 500; }
+  .bilan-chiffres { font-size: 11px; font-family: var(--mono); color: var(--muted); }
+  .bilan-chiffres span { font-weight: 500; }
+  .bar-wrap { background: var(--surface2); border-radius: 99px; height: 6px; overflow: hidden; }
+  .bar-fill { height: 6px; border-radius: 99px; transition: width 0.4s ease; }
+  .bar-fill.p { background: var(--blue); }
+  .bar-fill.g { background: var(--accent); }
+  .bar-fill.l { background: var(--amber); }
+  .bar-fill.over { background: var(--red); }
+  .bilan-status { font-size: 10px; font-family: var(--mono); margin-top: 4px; }
+  .status-ok { color: var(--accent); }
+  .status-low { color: var(--muted); }
+  .status-over { color: var(--red); }
+
+  /* BTN RESET */
+  .btn-reset { background: none; border: 1px solid var(--border); border-radius: 6px; color: var(--muted); font-family: var(--mono); font-size: 10px; padding: 5px 12px; cursor: pointer; float: right; transition: all 0.15s; }
+  .btn-reset:hover { border-color: var(--red); color: var(--red); }
+
+  /* KCAL JOUR */
+  .kcal-jour { display: flex; justify-content: center; align-items: baseline; gap: 6px; padding: 10px 0 0; border-top: 1px solid var(--border); margin-top: 10px; }
+  .kcal-num { font-size: 22px; font-weight: 600; font-family: var(--mono); color: var(--text); }
+  .kcal-lbl { font-size: 11px; font-family: var(--mono); color: var(--muted); }
+  .kcal-cible { font-size: 11px; font-family: var(--mono); color: var(--muted); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-title">Calculateur Macros</div>
+  <div class="header-name">Ludo — Carbs Cycling</div>
+  <div class="jour-selector">
+    <button class="jour-btn active" onclick="setJour('sport')">Lun–Ven (Sport)</button>
+    <button class="jour-btn" onclick="setJour('samedi')">Samedi</button>
+    <button class="jour-btn" onclick="setJour('dimanche')">Dimanche</button>
+  </div>
+</div>
+
+<div class="cibles" id="cibles-bar">
+  <div class="cible-box"><div class="cible-lbl">Prot. cible</div><div class="cible-val p" id="c-p">200g</div></div>
+  <div class="cible-box"><div class="cible-lbl">Glucides cible</div><div class="cible-val g" id="c-g">180g</div></div>
+  <div class="cible-box"><div class="cible-lbl">Lipides cible</div><div class="cible-val l" id="c-l">55g</div></div>
+</div>
+
+<div class="main">
+
+  <!-- RECHERCHE -->
+  <div class="search-wrap">
+    <span class="search-icon">&#9906;</span>
+    <input type="text" class="search-input" id="search-input" placeholder="Rechercher un aliment..." autocomplete="off" oninput="onSearch(this.value)">
+    <button class="search-clear" id="search-clear" onclick="clearSearch()">&#215;</button>
+  </div>
+  <div class="suggestions" id="suggestions"></div>
+
+  <!-- AJOUT MANUEL -->
+  <button class="btn-add-manual" onclick="toggleManual()">+ Aliment non trouvé — saisie manuelle</button>
+
+  <div class="manual-form" id="manual-form">
+    <div class="manual-title">Saisie manuelle</div>
+    <div class="manual-grid" style="margin-bottom:8px">
+      <div style="grid-column:1/-1">
+        <div class="field-lbl">Nom de l'aliment</div>
+        <input type="text" class="field-input" id="m-nom" placeholder="ex: Skyr nature" style="width:100%">
+      </div>
+    </div>
+    <div class="manual-grid" style="margin-bottom:8px">
+      <div>
+        <div class="field-lbl">Quantité (g)</div>
+        <input type="number" class="field-input" id="m-qte" placeholder="150" min="1">
+      </div>
+      <div>
+        <div class="field-lbl">Kcal / 100g</div>
+        <input type="number" class="field-input" id="m-kcal" placeholder="60" min="0" step="0.1">
+      </div>
+    </div>
+    <div class="manual-grid-3">
+      <div>
+        <div class="field-lbl">Prot / 100g</div>
+        <input type="number" class="field-input" id="m-p" placeholder="10" min="0" step="0.1">
+      </div>
+      <div>
+        <div class="field-lbl">Gluc / 100g</div>
+        <input type="number" class="field-input" id="m-g" placeholder="4" min="0" step="0.1">
+      </div>
+      <div>
+        <div class="field-lbl">Lip / 100g</div>
+        <input type="number" class="field-input" id="m-l" placeholder="0.2" min="0" step="0.1">
+      </div>
+      <div>
+        <div class="field-lbl">Repas</div>
+        <select class="field-input" id="m-repas-sel" style="font-size:12px"></select>
+      </div>
+    </div>
+    <button class="btn-add" onclick="addManual()">Ajouter</button>
+  </div>
+
+  <!-- REPAS TABS -->
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px">
+    <div class="section-title" style="margin-bottom:0">Repas</div>
+    <button class="btn-reset" onclick="resetJour()">Réinitialiser la journée</button>
+  </div>
+  <div class="repas-tabs" id="repas-tabs"></div>
+
+  <!-- LISTE ALIMENTS DU REPAS ACTIF -->
+  <div class="aliment-list" id="aliment-list"></div>
+
+  <!-- TOTAUX REPAS -->
+  <div class="totaux-repas">
+    <div class="totaux-title">Total repas actif</div>
+    <div class="totaux-grid">
+      <div class="total-cell"><div class="total-lbl">Protéines</div><div class="total-num p" id="tr-p">0g</div></div>
+      <div class="total-cell"><div class="total-lbl">Glucides</div><div class="total-num g" id="tr-g">0g</div></div>
+      <div class="total-cell"><div class="total-lbl">Lipides</div><div class="total-num l" id="tr-l">0g</div></div>
+      <div class="total-cell"><div class="total-lbl">Kcal</div><div class="total-num k" id="tr-k">0</div></div>
+    </div>
+  </div>
+
+  <!-- BILAN JOURNEE -->
+  <div class="bilan">
+    <div class="bilan-title">Bilan de la journée</div>
+
+    <div class="bilan-row">
+      <div class="bilan-header">
+        <span class="bilan-macro" style="color:var(--blue)">Protéines</span>
+        <span class="bilan-chiffres"><span id="bj-p">0</span>g / <span id="bc-p">200</span>g</span>
+      </div>
+      <div class="bar-wrap"><div class="bar-fill p" id="bar-p" style="width:0%"></div></div>
+      <div class="bilan-status" id="st-p"></div>
+    </div>
+
+    <div class="bilan-row">
+      <div class="bilan-header">
+        <span class="bilan-macro" style="color:var(--accent)">Glucides</span>
+        <span class="bilan-chiffres"><span id="bj-g">0</span>g / <span id="bc-g">180</span>g</span>
+      </div>
+      <div class="bar-wrap"><div class="bar-fill g" id="bar-g" style="width:0%"></div></div>
+      <div class="bilan-status" id="st-g"></div>
+    </div>
+
+    <div class="bilan-row">
+      <div class="bilan-header">
+        <span class="bilan-macro" style="color:var(--amber)">Lipides</span>
+        <span class="bilan-chiffres"><span id="bj-l">0</span>g / <span id="bc-l">55</span>g</span>
+      </div>
+      <div class="bar-wrap"><div class="bar-fill l" id="bar-l" style="width:0%"></div></div>
+      <div class="bilan-status" id="st-l"></div>
+    </div>
+
+    <div class="kcal-jour">
+      <span class="kcal-num" id="bj-k">0</span>
+      <span class="kcal-lbl">kcal</span>
+      <span class="kcal-cible" id="kcal-cible">/ ~2015 kcal cible</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ─── BASE ALIMENTS (pour 100g) ───────────────────────────────────────────────
+const DB = [
+  // PROTEINES ANIMALES
+  {n:'Blanc de poulet cuit',    cat:'Volaille',      k:110, p:23.0, g:0.0, l:1.5},
+  {n:'Blanc de poulet cru',     cat:'Volaille',      k:106, p:22.0, g:0.0, l:1.8},
+  {n:'Dinde escalope crue',     cat:'Volaille',      k:104, p:22.5, g:0.0, l:1.5},
+  {n:'Blanc de dinde cuit',     cat:'Volaille',      k:112, p:24.0, g:0.0, l:1.5},
+  {n:'Bœuf haché 5% MG',        cat:'Bœuf',          k:136, p:21.0, g:0.0, l:5.0},
+  {n:'Bœuf haché 10% MG',       cat:'Bœuf',          k:164, p:19.5, g:0.0, l:10.0},
+  {n:'Steak rumsteck',           cat:'Bœuf',          k:142, p:22.0, g:0.0, l:6.0},
+  {n:'Saumon frais',             cat:'Poisson',       k:208, p:20.0, g:0.0, l:13.0},
+  {n:'Maquereau filet',          cat:'Poisson',       k:189, p:19.0, g:0.0, l:12.0},
+  {n:'Thon au naturel',          cat:'Poisson',       k:103, p:23.0, g:0.0, l:1.0},
+  {n:'Cabillaud filet',          cat:'Poisson',       k:82,  p:18.0, g:0.0, l:0.7},
+  {n:'Crevettes cuites',         cat:'Fruits de mer', k:99,  p:21.0, g:0.0, l:1.5},
+  {n:'Œuf entier (1 œuf=55g)',   cat:'Œufs',          k:143, p:12.5, g:0.6, l:9.5},
+  {n:'Blanc d\'œuf',             cat:'Œufs',          k:52,  p:11.0, g:0.7, l:0.2},
+  {n:'Jambon blanc dégraissé',   cat:'Charcuterie',   k:107, p:18.5, g:0.5, l:3.5},
+  // LAITIERS
+  {n:'Yaourt grec 0%',           cat:'Laitiers',      k:57,  p:10.0, g:4.0, l:0.2},
+  {n:'Skyr nature',              cat:'Laitiers',      k:63,  p:11.0, g:4.0, l:0.2},
+  {n:'Fromage blanc 0%',         cat:'Laitiers',      k:46,  p:7.5,  g:4.0, l:0.1},
+  {n:'Cottage cheese',           cat:'Laitiers',      k:72,  p:12.5, g:3.5, l:1.0},
+  // WHEY
+  {n:'Whey Isolate (1 dose 30g)',cat:'Suppléments',   k:114, p:25.0, g:2.0, l:0.5},
+  // GLUCIDES COMPLEXES
+  {n:'Riz basmati cru',          cat:'Féculents',     k:350, p:7.5,  g:77.0,l:0.5},
+  {n:'Riz basmati cuit',         cat:'Féculents',     k:130, p:2.7,  g:28.0,l:0.2},
+  {n:'Patate douce crue',        cat:'Féculents',     k:86,  p:1.6,  g:20.0,l:0.1},
+  {n:'Patate douce cuite',       cat:'Féculents',     k:76,  p:1.4,  g:17.5,l:0.1},
+  {n:'Flocons d\'avoine',        cat:'Féculents',     k:364, p:12.5, g:62.0,l:6.5},
+  {n:'Pain complet',             cat:'Féculents',     k:247, p:8.5,  g:44.0,l:3.0},
+  {n:'Lentilles cuites',         cat:'Légumineuses',  k:116, p:9.0,  g:20.0,l:0.4},
+  {n:'Pois chiches cuits',       cat:'Légumineuses',  k:164, p:8.9,  g:27.0,l:2.6},
+  {n:'Haricots rouges cuits',    cat:'Légumineuses',  k:127, p:8.7,  g:22.0,l:0.5},
+  {n:'Quinoa cuit',              cat:'Féculents',     k:120, p:4.4,  g:21.0,l:1.9},
+  {n:'Pomme de terre cuite',     cat:'Féculents',     k:87,  p:1.9,  g:20.0,l:0.1},
+  // FRUITS
+  {n:'Banane',                   cat:'Fruits',        k:89,  p:1.1,  g:22.0,l:0.3},
+  {n:'Pomme',                    cat:'Fruits',        k:52,  p:0.3,  g:14.0,l:0.2},
+  {n:'Orange',                   cat:'Fruits',        k:47,  p:0.9,  g:12.0,l:0.1},
+  {n:'Kiwi',                     cat:'Fruits',        k:61,  p:1.1,  g:14.0,l:0.5},
+  {n:'Mangue',                   cat:'Fruits',        k:60,  p:0.8,  g:15.0,l:0.4},
+  {n:'Myrtilles',                cat:'Fruits',        k:57,  p:0.7,  g:14.0,l:0.3},
+  {n:'Fraises',                  cat:'Fruits',        k:32,  p:0.7,  g:7.7, l:0.3},
+  // LIPIDES
+  {n:'Huile d\'olive',           cat:'Lipides',       k:884, p:0.0,  g:0.0, l:100.0},
+  {n:'Huile de coco',            cat:'Lipides',       k:862, p:0.0,  g:0.0, l:100.0},
+  {n:'Avocat',                   cat:'Lipides',       k:160, p:2.0,  g:9.0, l:15.0},
+  {n:'Amandes',                  cat:'Oléagineux',    k:579, p:21.0, g:22.0,l:50.0},
+  {n:'Noix',                     cat:'Oléagineux',    k:654, p:15.0, g:14.0,l:65.0},
+  {n:'Beurre de cacahuète nat.', cat:'Oléagineux',    k:588, p:25.0, g:20.0,l:50.0},
+  {n:'Noix de cajou',            cat:'Oléagineux',    k:553, p:18.0, g:30.0,l:44.0},
+  // LEGUMES (pour 100g nets)
+  {n:'Brocoli',                  cat:'Légumes',       k:34,  p:2.8,  g:7.0, l:0.4},
+  {n:'Épinards',                 cat:'Légumes',       k:23,  p:2.9,  g:3.6, l:0.4},
+  {n:'Courgette',                cat:'Légumes',       k:17,  p:1.2,  g:3.1, l:0.3},
+  {n:'Haricots verts',           cat:'Légumes',       k:31,  p:1.8,  g:7.0, l:0.1},
+  {n:'Champignons de Paris',     cat:'Légumes',       k:22,  p:3.1,  g:3.3, l:0.3},
+  {n:'Salade verte',             cat:'Légumes',       k:15,  p:1.4,  g:2.9, l:0.2},
+  {n:'Tomate',                   cat:'Légumes',       k:18,  p:0.9,  g:3.9, l:0.2},
+  {n:'Poivron',                  cat:'Légumes',       k:26,  p:1.0,  g:6.0, l:0.3},
+  {n:'Concombre',                cat:'Légumes',       k:15,  p:0.7,  g:3.6, l:0.1},
+  {n:'Asperges',                 cat:'Légumes',       k:20,  p:2.2,  g:3.9, l:0.1},
+];
+
+// ─── CIBLES PAR JOUR ─────────────────────────────────────────────────────────
+const CIBLES = {
+  sport:    { p:200, g:180, l:55,  k:2015, label:'Jour sport (lun–ven)' },
+  samedi:   { p:200, g:80,  l:65,  k:1705, label:'Samedi' },
+  dimanche: { p:200, g:40,  l:70,  k:1590, label:'Dimanche' },
+};
+
+// ─── ETAT ────────────────────────────────────────────────────────────────────
+let jour = 'sport';
+let repasActif = 0;
+let data = loadData();
+
+function loadData() {
+  try { return JSON.parse(localStorage.getItem('ludo_calc_v1') || 'null') || initData(); }
+  catch(e) { return initData(); }
+}
+function initData() {
+  return {
+    sport:    { repas: [{ nom:'Repas 1', aliments:[] }] },
+    samedi:   { repas: [{ nom:'Repas 1', aliments:[] }] },
+    dimanche: { repas: [{ nom:'Repas 1', aliments:[] }] },
+  };
+}
+function save() {
+  try { localStorage.setItem('ludo_calc_v1', JSON.stringify(data)); } catch(e) {}
+}
+
+// ─── JOUR ────────────────────────────────────────────────────────────────────
+function setJour(j) {
+  jour = j;
+  repasActif = 0;
+  document.querySelectorAll('.jour-btn').forEach((b,i) => b.classList.toggle('active', ['sport','samedi','dimanche'][i] === j));
+  const c = CIBLES[j];
+  document.getElementById('c-p').textContent = c.p + 'g';
+  document.getElementById('c-g').textContent = c.g + 'g';
+  document.getElementById('c-l').textContent = c.l + 'g';
+  document.getElementById('kcal-cible').textContent = '/ ~' + c.k + ' kcal cible';
+  render();
+}
+
+// ─── RECHERCHE ───────────────────────────────────────────────────────────────
+function onSearch(val) {
+  const q = val.trim().toLowerCase();
+  document.getElementById('search-clear').style.display = q ? 'block' : 'none';
+  const box = document.getElementById('suggestions');
+  if (!q) { box.style.display = 'none'; return; }
+  const results = DB.filter(a => a.n.toLowerCase().includes(q)).slice(0, 12);
+  if (!results.length) { box.style.display = 'none'; return; }
+  box.innerHTML = results.map((a,i) => `
+    <div class="sugg-item" onclick="selectAliment(${i}, '${val}')">
+      <div>
+        <div class="sugg-name">${a.n}</div>
+        <div class="sugg-cat">${a.cat}</div>
+      </div>
+      <div class="sugg-macros">
+        <span style="color:var(--blue)">P ${a.p}g</span>
+        <span style="color:var(--accent)">G ${a.g}g</span>
+        <span style="color:var(--amber)">L ${a.l}g</span>
+        <span style="color:var(--muted)">/ 100g</span>
+      </div>
+    </div>`
+  ).join('');
+  box._results = results;
+  box.style.display = 'block';
+}
+
+function selectAliment(i, query) {
+  const results = DB.filter(a => a.n.toLowerCase().includes(query.trim().toLowerCase()));
+  const a = results[i];
+  if (!a) return;
+  const qte = prompt('Quantité en grammes pour "' + a.n + '" ?', '100');
+  if (!qte || isNaN(parseFloat(qte))) return;
+  const q = parseFloat(qte);
+  const mult = q / 100;
+  data[jour].repas[repasActif].aliments.push({
+    nom: a.n,
+    qte: q,
+    p: Math.round(a.p * mult * 10) / 10,
+    g: Math.round(a.g * mult * 10) / 10,
+    l: Math.round(a.l * mult * 10) / 10,
+    k: Math.round(a.k * mult),
+  });
+  save();
+  clearSearch();
+  render();
+}
+
+function clearSearch() {
+  document.getElementById('search-input').value = '';
+  document.getElementById('search-clear').style.display = 'none';
+  document.getElementById('suggestions').style.display = 'none';
+}
+
+// ─── AJOUT MANUEL ────────────────────────────────────────────────────────────
+function toggleManual() {
+  const f = document.getElementById('manual-form');
+  f.style.display = f.style.display === 'block' ? 'none' : 'block';
+  updateManualRepasSel();
+}
+function updateManualRepasSel() {
+  const sel = document.getElementById('m-repas-sel');
+  sel.innerHTML = data[jour].repas.map((r,i) => `<option value="${i}" ${i===repasActif?'selected':''}>${r.nom}</option>`).join('');
+}
+function addManual() {
+  const nom = document.getElementById('m-nom').value.trim();
+  const qte = parseFloat(document.getElementById('m-qte').value);
+  const kcal = parseFloat(document.getElementById('m-kcal').value) || 0;
+  const p = parseFloat(document.getElementById('m-p').value) || 0;
+  const g = parseFloat(document.getElementById('m-g').value) || 0;
+  const l = parseFloat(document.getElementById('m-l').value) || 0;
+  const repasIdx = parseInt(document.getElementById('m-repas-sel').value);
+  if (!nom || isNaN(qte) || qte <= 0) { alert('Nom et quantité obligatoires.'); return; }
+  const mult = qte / 100;
+  data[jour].repas[repasIdx].aliments.push({
+    nom, qte,
+    p: Math.round(p * mult * 10) / 10,
+    g: Math.round(g * mult * 10) / 10,
+    l: Math.round(l * mult * 10) / 10,
+    k: Math.round(kcal * mult),
+  });
+  save();
+  ['m-nom','m-qte','m-kcal','m-p','m-g','m-l'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('manual-form').style.display = 'none';
+  repasActif = repasIdx;
+  render();
+}
+
+// ─── REPAS ───────────────────────────────────────────────────────────────────
+function addRepas() {
+  const n = data[jour].repas.length + 1;
+  data[jour].repas.push({ nom: 'Repas ' + n, aliments: [] });
+  repasActif = data[jour].repas.length - 1;
+  save(); render();
+}
+function setRepasActif(i) { repasActif = i; render(); }
+function deleteAliment(idx) {
+  data[jour].repas[repasActif].aliments.splice(idx, 1);
+  save(); render();
+}
+function resetJour() {
+  if (!confirm('Effacer tous les repas de cette journée ?')) return;
+  data[jour] = { repas: [{ nom:'Repas 1', aliments:[] }] };
+  repasActif = 0;
+  save(); render();
+}
+
+// ─── RENDER ──────────────────────────────────────────────────────────────────
+function render() {
+  const repas = data[jour].repas;
+  const c = CIBLES[jour];
+
+  // tabs
+  const tabsEl = document.getElementById('repas-tabs');
+  tabsEl.innerHTML = repas.map((r,i) => `
+    <button class="repas-tab ${i===repasActif?'active':''}" onclick="setRepasActif(${i})">${r.nom}</button>
+  `).join('') + `<button class="btn-new-repas" onclick="addRepas()">+ Repas</button>`;
+
+  // aliments du repas actif
+  const aliments = repas[repasActif] ? repas[repasActif].aliments : [];
+  const listEl = document.getElementById('aliment-list');
+  if (!aliments.length) {
+    listEl.innerHTML = '<div class="empty-state">Aucun aliment — recherche ou saisie manuelle ci-dessus</div>';
+  } else {
+    listEl.innerHTML = aliments.map((a,i) => `
+      <div class="aliment-item">
+        <div>
+          <div class="aliment-name">${a.nom}</div>
+          <div class="aliment-qte">${a.qte}g · ${a.k} kcal</div>
+          <div class="aliment-macros">
+            <span class="am-p">P ${a.p}g</span>
+            <span class="am-g">G ${a.g}g</span>
+            <span class="am-l">L ${a.l}g</span>
+          </div>
+        </div>
+        <button class="btn-del" onclick="deleteAliment(${i})">&#215;</button>
+      </div>`
+    ).join('');
+  }
+
+  // totaux repas actif
+  const trP = aliments.reduce((s,a)=>s+a.p,0);
+  const trG = aliments.reduce((s,a)=>s+a.g,0);
+  const trL = aliments.reduce((s,a)=>s+a.l,0);
+  const trK = aliments.reduce((s,a)=>s+a.k,0);
+  document.getElementById('tr-p').textContent = Math.round(trP*10)/10 + 'g';
+  document.getElementById('tr-g').textContent = Math.round(trG*10)/10 + 'g';
+  document.getElementById('tr-l').textContent = Math.round(trL*10)/10 + 'g';
+  document.getElementById('tr-k').textContent = Math.round(trK);
+
+  // totaux journée
+  const allAl = repas.flatMap(r => r.aliments);
+  const bjP = allAl.reduce((s,a)=>s+a.p,0);
+  const bjG = allAl.reduce((s,a)=>s+a.g,0);
+  const bjL = allAl.reduce((s,a)=>s+a.l,0);
+  const bjK = allAl.reduce((s,a)=>s+a.k,0);
+
+  document.getElementById('bj-p').textContent = Math.round(bjP*10)/10;
+  document.getElementById('bj-g').textContent = Math.round(bjG*10)/10;
+  document.getElementById('bj-l').textContent = Math.round(bjL*10)/10;
+  document.getElementById('bj-k').textContent = Math.round(bjK);
+  document.getElementById('bc-p').textContent = c.p;
+  document.getElementById('bc-g').textContent = c.g;
+  document.getElementById('bc-l').textContent = c.l;
+
+  function updateBar(id, barId, stId, val, cible) {
+    const pct = Math.min(100, Math.round((val/cible)*100));
+    const over = val > cible * 1.05;
+    const bar = document.getElementById(barId);
+    bar.style.width = pct + '%';
+    bar.className = 'bar-fill ' + id + (over ? ' over' : '');
+    const reste = cible - val;
+    const st = document.getElementById(stId);
+    if (over) st.innerHTML = `<span class="status-over">+${Math.round((val-cible)*10)/10}g au-dessus de la cible</span>`;
+    else if (pct >= 90) st.innerHTML = `<span class="status-ok">Cible atteinte</span>`;
+    else st.innerHTML = `<span class="status-low">Encore ${Math.round(reste*10)/10}g</span>`;
+  }
+  updateBar('p','bar-p','st-p', bjP, c.p);
+  updateBar('g','bar-g','st-g', bjG, c.g);
+  updateBar('l','bar-l','st-l', bjL, c.l);
+}
+
+render();
+</script>
+</body>
+</html>
