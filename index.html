@@ -9,7 +9,7 @@
 <meta name="theme-color" content="#0f0f0f">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon.png">
-<title>Macros Ludo v9</title>
+<title>Macros Ludo v10</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Sora:wght@400;500;600&display=swap');
 :root{
@@ -293,7 +293,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 <!-- ═══════════ PANEL SEMAINE ═══════════ -->
 <div id="p-semaine" class="panel on">
   <div class="hdr">
-    <div class="hdr-l"><div class="hdr-lbl">Macros semaine · v2</div><div class="hdr-title">Ludo <span style="font-size:12px;font-family:var(--m);color:var(--mu)">v9</span></div></div>
+    <div class="hdr-l"><div class="hdr-lbl">Macros semaine · v2</div><div class="hdr-title">Ludo <span style="font-size:12px;font-family:var(--m);color:var(--mu)">v10</span></div></div>
     <button class="btn-danger" onclick="resetSemaine()">Reset</button>
   </div>
   <div class="strip">
@@ -332,7 +332,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 
     <div class="scan-area" id="scan-area">
       <div class="scan-title">Scan code-barres</div>
-      <video id="scan-video" playsinline autoplay muted></video>
+      <video id="scan-video" playsinline autoplay muted webkit-playsinline style="width:100%;border-radius:8px;max-height:220px;background:#000"></video>
       <div class="scan-hint" id="scan-hint">Place le code-barres devant la caméra</div>
       <button class="btn-scan-stop" onclick="stopScan()">Arrêter</button>
     </div>
@@ -915,11 +915,11 @@ function setJourType(jid,type){
   data[jid].repas=REPAS_PAR_TYPE[type].map(n=>({nom:n,aliments:[]}));
   save();render();
 }
-function loadData(){try{return JSON.parse(localStorage.getItem('ludo_app_v9')||'null')||initData();}catch(e){return initData();}}
+function loadData(){try{return JSON.parse(localStorage.getItem('ludo_app_v10')||'null')||initData();}catch(e){return initData();}}
 function initData(){const d={};JOURS.forEach(j=>{const t=getJourType(j.id);d[j.id]={repas:REPAS_PAR_TYPE[t].map(n=>({nom:n,aliments:[]}))};});return d;}
 function loadFavs(){try{return JSON.parse(localStorage.getItem('ludo_favs_v1')||'[]');}catch(e){return [];}}
 function loadCheckins(){try{return JSON.parse(localStorage.getItem('ludo_checkins_v1')||'[]');}catch(e){return [];}}
-function save(){try{localStorage.setItem('ludo_app_v9',JSON.stringify(data));}catch(e){}}
+function save(){try{localStorage.setItem('ludo_app_v10',JSON.stringify(data));}catch(e){}}
 function saveFavs(){try{localStorage.setItem('ludo_favs_v1',JSON.stringify(favs));}catch(e){}}
 function saveCheckins(){try{localStorage.setItem('ludo_checkins_v1',JSON.stringify(checkins));}catch(e){}}
 function r1(v){return Math.round(v*10)/10;}
@@ -1125,48 +1125,69 @@ function toggleFavFromRepas(jid,ri,ai){
 
 // ══════════════════════════ SCAN
 async function startScan(){
-  document.getElementById('scan-area').style.display='block';
+  const area=document.getElementById('scan-area');
+  const hint=document.getElementById('scan-hint');
+  area.style.display='block';
+  hint.textContent='Initialisation caméra…';
   try{
-    scanStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false});
+    // Contraintes optimisées pour Safari iOS
+    const constraints={
+      video:{
+        facingMode:{ideal:'environment'},
+        width:{ideal:1280},
+        height:{ideal:720}
+      },
+      audio:false
+    };
+    scanStream=await navigator.mediaDevices.getUserMedia(constraints);
     const video=document.getElementById('scan-video');
-    video.srcObject=scanStream;video.play();
+    video.srcObject=scanStream;
+    // Attributs essentiels pour Safari iOS
+    video.setAttribute('playsinline','true');
+    video.setAttribute('muted','true');
+    video.muted=true;
+    await video.play();
+    // Attendre que la vidéo soit vraiment active
+    await new Promise(resolve=>{
+      if(video.readyState>=2){resolve();return;}
+      video.onloadeddata=resolve;
+      video.oncanplay=resolve;
+      setTimeout(resolve,2000); // fallback 2s
+    });
     scanCanvas=document.createElement('canvas');
-    scanCtx=scanCanvas.getContext('2d');
-    video.addEventListener('loadeddata',()=>{
-      scanCanvas.width=video.videoWidth||640;
-      scanCanvas.height=video.videoHeight||480;
-      setTimeout(()=>scanLoop(video), 500);
-    });
-    video.addEventListener('loadedmetadata',()=>{
-      if(!scanCanvas.width){
-        scanCanvas.width=video.videoWidth||640;
-        scanCanvas.height=video.videoHeight||480;
-        setTimeout(()=>scanLoop(video), 500);
-      }
-    });
-  }catch(e){document.getElementById('scan-hint').textContent='Caméra non disponible — autorise dans Réglages Safari.';}
+    scanCanvas.width=video.videoWidth||640;
+    scanCanvas.height=video.videoHeight||480;
+    scanCtx=scanCanvas.getContext('2d',{willReadFrequently:true});
+    hint.textContent='Place le code-barres devant la caméra';
+    // Utiliser setInterval plus stable que rAF sur Safari iOS
+    scanAnimId=setInterval(()=>scanTick(video),150);
+  }catch(e){
+    console.error('Scan error:',e);
+    hint.textContent='Caméra non disponible. Va dans Réglages → Safari → Caméra → Autoriser';
+  }
 }
-function scanLoop(video){
-  if(!scanStream)return;
-  if(video.readyState < 2){
-    scanAnimId=requestAnimationFrame(()=>scanLoop(video));
-    return;
+function scanTick(video){
+  if(!scanStream||!scanCanvas||video.readyState<2)return;
+  if(video.videoWidth>0&&scanCanvas.width!==video.videoWidth){
+    scanCanvas.width=video.videoWidth;
+    scanCanvas.height=video.videoHeight;
   }
   try{
-  scanCtx.drawImage(video,0,0,scanCanvas.width,scanCanvas.height);}catch(e){
-    scanAnimId=requestAnimationFrame(()=>scanLoop(video));return;
-  }
-  const imgData=scanCtx.getImageData(0,0,scanCanvas.width,scanCanvas.height);
-  const code=jsQR(imgData.data,imgData.width,imgData.height);
-  if(code&&code.data){
-    document.getElementById('scan-hint').textContent='Code détecté — recherche…';
-    stopScan();fetchOFFBarcode(code.data);return;
-  }
-  scanAnimId=requestAnimationFrame(()=>scanLoop(video));
+    scanCtx.drawImage(video,0,0,scanCanvas.width,scanCanvas.height);
+    const imgData=scanCtx.getImageData(0,0,scanCanvas.width,scanCanvas.height);
+    const code=jsQR(imgData.data,imgData.width,imgData.height,{inversionAttempts:'dontInvert'});
+    if(code&&code.data){
+      document.getElementById('scan-hint').textContent='Code detecte — recherche en cours…';
+      stopScan();
+      fetchOFFBarcode(code.data);
+    }
+  }catch(e){}
 }
+function scanLoop(video){} // garde pour compatibilité
 function stopScan(){
   if(scanStream){scanStream.getTracks().forEach(t=>t.stop());scanStream=null;}
-  if(scanAnimId){cancelAnimationFrame(scanAnimId);scanAnimId=null;}
+  if(scanAnimId){clearInterval(scanAnimId);scanAnimId=null;}
+  scanCanvas=null;scanCtx=null;
   document.getElementById('scan-area').style.display='none';
   document.getElementById('srch-zone').style.display='block';
 }
