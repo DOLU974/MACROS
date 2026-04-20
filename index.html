@@ -9,7 +9,7 @@
 <meta name="theme-color" content="#0f0f0f">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon.png">
-<title>Macros Ludo v6</title>
+<title>Macros Ludo v7</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Sora:wght@400;500;600&display=swap');
 :root{
@@ -288,7 +288,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 <!-- ═══════════ PANEL SEMAINE ═══════════ -->
 <div id="p-semaine" class="panel on">
   <div class="hdr">
-    <div class="hdr-l"><div class="hdr-lbl">Macros semaine · v2</div><div class="hdr-title">Ludo <span style="font-size:12px;font-family:var(--m);color:var(--mu)">v6</span></div></div>
+    <div class="hdr-l"><div class="hdr-lbl">Macros semaine · v2</div><div class="hdr-title">Ludo <span style="font-size:12px;font-family:var(--m);color:var(--mu)">v7</span></div></div>
     <button class="btn-danger" onclick="resetSemaine()">Reset</button>
   </div>
   <div class="strip">
@@ -393,7 +393,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 
     <div class="card">
       <div class="rule-block"><div class="rule-title">Protéines — 200g / jour sans exception</div><div class="rule-text">Quelle que soit la journée, garde ou opération. La masse musculaire se protège par les protéines.</div></div>
-      <div class="rule-block"><div class="rule-title">Glucides — varient selon le jour</div><div class="rule-text">180g sport · 80g samedi · 40g dimanche. Priorité le matin et autour de l'effort. Zéro glucide au dîner.</div></div>
+      <div class="rule-block"><div class="rule-title">Glucides — varient selon le jour</div><div class="rule-text">180g sport · 80g samedi · 40g dimanche. Priorité le matin et autour de leffort. Zéro glucide au dîner.</div></div>
       <div class="rule-block"><div class="rule-title">Lipides — montent quand les glucides baissent</div><div class="rule-text">55g sport · 65g samedi · 70g dimanche.</div></div>
       <div class="rule-block am"><div class="rule-title">Créatine — 5g chaque matin, 7j/7</div><div class="rule-text">Même les jours off. Se sature dans le muscle sur 4 semaines — ne pas sauter.</div></div>
     </div>
@@ -829,12 +829,10 @@ const DB=[
 
 const CIBLES_REPAS = {
   sport: {
-    'Petit dejeuner':   {p:40, g:30, l:8,  k:350, whey:null,       note:'Léger avant sport — ne pas surcharger'},
-    'Pre-training':     {p:30, g:38, l:5,  k:320, whey:'opt',      note:'1h avant crossfit — glucides rapides + protéines légères. Whey optionnelle si pas faim'},
-    'Post-training':    {p:35, g:55, l:3,  k:375, whey:'oblig',    note:'Dans les 30 min après le crossfit — CRITIQUE. Whey obligatoire ici'},
-    'Dejeuner':         {p:45, g:57, l:12, k:530, whey:null,       note:'Repas principal — protéines + glucides complexes + légumes'},
-    'Collation matin':  {p:27, g:0,  l:10, k:195, whey:'opt',      note:'Si besoin. Zéro glucides. Whey pour compléter si protéines insuffisantes'},
-    'Diner':            {p:23, g:0,  l:17, k:245, whey:null,       note:'Zéro glucides — protéines + lipides + légumes verts uniquement'},
+    'Post-training (1er repas)': {p:60, g:70, l:5,  k:565, whey:'oblig', note:'1er repas apres le crossfit — dans les 30 min MAXIMUM. Whey obligatoire + glucides rapides. Repas le plus important de la journee.'},
+    'Dejeuner':                  {p:70, g:70, l:15, k:695, whey:null,    note:'Repas principal — proteines + glucides complexes + legumes verts a volonte. Plus gros repas de la journee.'},
+    'Collation':                 {p:35, g:25, l:10, k:330, whey:'opt',   note:'Si faim. Glucides moderees. Whey optionnelle pour completer les proteines si besoin.'},
+    'Diner':                     {p:35, g:0,  l:25, k:365, whey:null,    note:'Zero glucides — proteines + lipides + legumes verts uniquement. Corps en mode recuperation/destockage.'},
   },
   samedi: {
     'Petit dejeuner':   {p:52, g:42, l:18, k:542, whey:'opt',      note:'Tous les glucides ici — plus grosse prise de glucides de la journée. Whey possible pour atteindre les protéines'},
@@ -865,7 +863,7 @@ const JOURS=[
   {id:'dim',nom:'Dimanche'},
 ];
 const REPAS_PAR_TYPE={
-  sport:   ['Petit dejeuner','Collation matin','Dejeuner','Pre-training','Post-training','Diner'],
+  sport:   ['Post-training (1er repas)','Dejeuner','Collation','Diner'],
   samedi:  ['Petit dejeuner','Collation','Dejeuner','Diner'],
   dimanche:['Petit dejeuner','Dejeuner','Collation','Diner'],
 };
