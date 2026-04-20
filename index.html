@@ -9,7 +9,7 @@
 <meta name="theme-color" content="#0f0f0f">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon.png">
-<title>Macros Ludo v7</title>
+<title>Macros Ludo v8</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Sora:wght@400;500;600&display=swap');
 :root{
@@ -288,7 +288,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 <!-- ═══════════ PANEL SEMAINE ═══════════ -->
 <div id="p-semaine" class="panel on">
   <div class="hdr">
-    <div class="hdr-l"><div class="hdr-lbl">Macros semaine · v2</div><div class="hdr-title">Ludo <span style="font-size:12px;font-family:var(--m);color:var(--mu)">v7</span></div></div>
+    <div class="hdr-l"><div class="hdr-lbl">Macros semaine · v2</div><div class="hdr-title">Ludo <span style="font-size:12px;font-family:var(--m);color:var(--mu)">v8</span></div></div>
     <button class="btn-danger" onclick="resetSemaine()">Reset</button>
   </div>
   <div class="strip">
@@ -829,10 +829,11 @@ const DB=[
 
 const CIBLES_REPAS = {
   sport: {
-    'Post-training (1er repas)': {p:60, g:70, l:5,  k:565, whey:'oblig', note:'1er repas apres le crossfit — dans les 30 min MAXIMUM. Whey obligatoire + glucides rapides. Repas le plus important de la journee.'},
-    'Dejeuner':                  {p:70, g:70, l:15, k:695, whey:null,    note:'Repas principal — proteines + glucides complexes + legumes verts a volonte. Plus gros repas de la journee.'},
-    'Collation':                 {p:35, g:25, l:10, k:330, whey:'opt',   note:'Si faim. Glucides moderees. Whey optionnelle pour completer les proteines si besoin.'},
-    'Diner':                     {p:35, g:0,  l:25, k:365, whey:null,    note:'Zero glucides — proteines + lipides + legumes verts uniquement. Corps en mode recuperation/destockage.'},
+    'Petit dejeuner': {p:35, g:30, l:8,  k:330, whey:null,    note:'Leger avant le sport — ne pas surcharger. Glucides moderees pour avoir de lenergie. Creatine 5g a prendre ici.'},
+    'Post-training':  {p:50, g:65, l:3,  k:491, whey:'oblig', note:'Dans les 30 min apres le crossfit — OBLIGATOIRE. Whey + glucides rapides. Fenetre anabolique critique pour la recuperation musculaire.'},
+    'Dejeuner':       {p:60, g:55, l:15, k:595, whey:null,    note:'Repas principal — proteines + glucides complexes + legumes verts a volonte. Plus gros repas de la journee.'},
+    'Collation':      {p:30, g:20, l:10, k:290, whey:'opt',   note:'Si faim. Glucides moderees. Whey optionnelle pour completer les proteines si besoin.'},
+    'Diner':          {p:25, g:10, l:19, k:309, whey:null,    note:'Tres low carb — proteines + lipides + legumes verts. Corps en mode recuperation et destockage pendant la nuit.'},
   },
   samedi: {
     'Petit dejeuner':   {p:52, g:42, l:18, k:542, whey:'opt',      note:'Tous les glucides ici — plus grosse prise de glucides de la journée. Whey possible pour atteindre les protéines'},
@@ -863,7 +864,7 @@ const JOURS=[
   {id:'dim',nom:'Dimanche'},
 ];
 const REPAS_PAR_TYPE={
-  sport:   ['Post-training (1er repas)','Dejeuner','Collation','Diner'],
+  sport:   ['Petit dejeuner','Post-training','Dejeuner','Collation','Diner'],
   samedi:  ['Petit dejeuner','Collation','Dejeuner','Diner'],
   dimanche:['Petit dejeuner','Dejeuner','Collation','Diner'],
 };
@@ -903,11 +904,11 @@ function setJourType(jid,type){
   data[jid].repas=REPAS_PAR_TYPE[type].map(n=>({nom:n,aliments:[]}));
   save();render();
 }
-function loadData(){try{return JSON.parse(localStorage.getItem('ludo_app_v7')||'null')||initData();}catch(e){return initData();}}
+function loadData(){try{return JSON.parse(localStorage.getItem('ludo_app_v8')||'null')||initData();}catch(e){return initData();}}
 function initData(){const d={};JOURS.forEach(j=>{const t=getJourType(j.id);d[j.id]={repas:REPAS_PAR_TYPE[t].map(n=>({nom:n,aliments:[]}))};});return d;}
 function loadFavs(){try{return JSON.parse(localStorage.getItem('ludo_favs_v1')||'[]');}catch(e){return [];}}
 function loadCheckins(){try{return JSON.parse(localStorage.getItem('ludo_checkins_v1')||'[]');}catch(e){return [];}}
-function save(){try{localStorage.setItem('ludo_app_v7',JSON.stringify(data));}catch(e){}}
+function save(){try{localStorage.setItem('ludo_app_v8',JSON.stringify(data));}catch(e){}}
 function saveFavs(){try{localStorage.setItem('ludo_favs_v1',JSON.stringify(favs));}catch(e){}}
 function saveCheckins(){try{localStorage.setItem('ludo_checkins_v1',JSON.stringify(checkins));}catch(e){}}
 function r1(v){return Math.round(v*10)/10;}
