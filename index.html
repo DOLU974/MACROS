@@ -9,7 +9,7 @@
 <meta name="theme-color" content="#0f0f0f">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon.png">
-<title>Macros Ludo v8</title>
+<title>Macros Ludo v9</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Sora:wght@400;500;600&display=swap');
 :root{
@@ -90,6 +90,11 @@ body{background:var(--bg);color:var(--tx);font-family:var(--f);font-size:16px;mi
 .qte-u{font-size:14px;font-family:var(--m);color:var(--mu);flex-shrink:0}
 .btn-qok{background:var(--gr);color:#0f0f0f;border:none;border-radius:8px;padding:13px 18px;font-family:var(--m);font-size:13px;font-weight:500;cursor:pointer;flex-shrink:0}
 .qte-fav-row{display:flex;align-items:center;gap:8px;margin-top:10px}
+.qte-apercu{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:10px;padding:10px;background:var(--s2);border-radius:8px}
+.qa-cell{text-align:center}
+.qa-lbl{font-size:10px;font-family:var(--m);color:var(--mu);margin-bottom:2px;text-transform:uppercase}
+.qa-val{font-size:15px;font-weight:600;font-family:var(--m)}
+.qa-val.p{color:var(--bl)}.qa-val.g{color:var(--gr)}.qa-val.l{color:var(--am)}.qa-val.k{color:var(--tx)}
 .qte-fav-cb{width:18px;height:18px;cursor:pointer;accent-color:var(--gr)}
 .qte-fav-lbl{font-size:14px;font-family:var(--m);color:var(--mu)}
 .btn-qno{width:100%;background:none;border:1px solid var(--b2);border-radius:8px;color:var(--mu);font-family:var(--m);font-size:12px;padding:10px;cursor:pointer;margin-top:8px}
@@ -288,7 +293,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 <!-- ═══════════ PANEL SEMAINE ═══════════ -->
 <div id="p-semaine" class="panel on">
   <div class="hdr">
-    <div class="hdr-l"><div class="hdr-lbl">Macros semaine · v2</div><div class="hdr-title">Ludo <span style="font-size:12px;font-family:var(--m);color:var(--mu)">v8</span></div></div>
+    <div class="hdr-l"><div class="hdr-lbl">Macros semaine · v2</div><div class="hdr-title">Ludo <span style="font-size:12px;font-family:var(--m);color:var(--mu)">v9</span></div></div>
     <button class="btn-danger" onclick="resetSemaine()">Reset</button>
   </div>
   <div class="strip">
@@ -337,9 +342,15 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
       <div class="qte-alim" id="qte-name">—</div>
       <div class="qte-ctx" id="qte-ctx"></div>
       <div class="qte-row">
-        <input class="qte-in" id="qte-val" type="number" min="1" max="3000" value="100" inputmode="decimal">
+        <input class="qte-in" id="qte-val" type="number" min="1" max="3000" value="100" inputmode="decimal" oninput="updateApercu()">
         <span class="qte-u">g</span>
         <button class="btn-qok" onclick="confirmQte()">OK</button>
+      </div>
+      <div class="qte-apercu" id="qte-apercu">
+        <div class="qa-cell"><div class="qa-lbl">Prot.</div><div class="qa-val p" id="qa-p">0g</div></div>
+        <div class="qa-cell"><div class="qa-lbl">Gluc.</div><div class="qa-val g" id="qa-g">0g</div></div>
+        <div class="qa-cell"><div class="qa-lbl">Lip.</div><div class="qa-val l" id="qa-l">0g</div></div>
+        <div class="qa-cell"><div class="qa-lbl">Kcal</div><div class="qa-val k" id="qa-k">0</div></div>
       </div>
       <div class="qte-fav-row"><input type="checkbox" class="qte-fav-cb" id="qte-fav-cb"><label class="qte-fav-lbl" for="qte-fav-cb">Enregistrer dans mes favoris</label></div>
       <button class="btn-qno" onclick="cancelQte()">Annuler</button>
@@ -904,11 +915,11 @@ function setJourType(jid,type){
   data[jid].repas=REPAS_PAR_TYPE[type].map(n=>({nom:n,aliments:[]}));
   save();render();
 }
-function loadData(){try{return JSON.parse(localStorage.getItem('ludo_app_v8')||'null')||initData();}catch(e){return initData();}}
+function loadData(){try{return JSON.parse(localStorage.getItem('ludo_app_v9')||'null')||initData();}catch(e){return initData();}}
 function initData(){const d={};JOURS.forEach(j=>{const t=getJourType(j.id);d[j.id]={repas:REPAS_PAR_TYPE[t].map(n=>({nom:n,aliments:[]}))};});return d;}
 function loadFavs(){try{return JSON.parse(localStorage.getItem('ludo_favs_v1')||'[]');}catch(e){return [];}}
 function loadCheckins(){try{return JSON.parse(localStorage.getItem('ludo_checkins_v1')||'[]');}catch(e){return [];}}
-function save(){try{localStorage.setItem('ludo_app_v8',JSON.stringify(data));}catch(e){}}
+function save(){try{localStorage.setItem('ludo_app_v9',JSON.stringify(data));}catch(e){}}
 function saveFavs(){try{localStorage.setItem('ludo_favs_v1',JSON.stringify(favs));}catch(e){}}
 function saveCheckins(){try{localStorage.setItem('ludo_checkins_v1',JSON.stringify(checkins));}catch(e){}}
 function r1(v){return Math.round(v*10)/10;}
@@ -1020,6 +1031,16 @@ function clearSearch(){
 }
 
 // ══════════════════════════ PICK + QUANTITE
+function updateApercu(){
+  if(!pendingAlim) return;
+  const q=parseFloat(document.getElementById('qte-val').value)||0;
+  const mult=q/100;
+  const a=pendingAlim;
+  document.getElementById('qa-p').textContent=Math.round(a.p*mult*10)/10+'g';
+  document.getElementById('qa-g').textContent=Math.round(a.g*mult*10)/10+'g';
+  document.getElementById('qa-l').textContent=Math.round(a.l*mult*10)/10+'g';
+  document.getElementById('qa-k').textContent=Math.round(a.k*mult);
+}
 function pickAlim(i){
   const items=document.getElementById('sugg-box')._items;
   if(!items||!items[i])return;
@@ -1031,6 +1052,7 @@ function pickAlim(i){
   updateQteCtx();
   document.getElementById('qte-box').style.display='block';
   document.getElementById('sugg-box').style.display='none';
+  updateApercu();
   setTimeout(()=>document.getElementById('qte-val').focus(),120);
 }
 function updateQteCtx(){
